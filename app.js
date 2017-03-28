@@ -1,10 +1,12 @@
 // incorporating firebase to host arrival and departure data. retrieve and manipulate information
-// capture local time 
+// capture local time using Moment.js
 // capture and store user input to firebase
 // create a new table row each time you press submit
 // create <td> for each input
 // calculate next arrival time according to current time, first train time, and frequency
 // calculate minutes away
+// create array of user inputs
+// iterate through array each time submit button pressed print data to table
 
   var config = {
     apiKey: "AIzaSyC0cRFojizk0dCWbXu94rFZZqb5CfPqf4U",
@@ -20,9 +22,9 @@
   var destination = "";
   var firstTime = "";
   var frequency = "";
-  var currentTime =
+  var currentTime = moment().format('h:mm a');
 
-  $("#submit").on("click",function(){
+  $("#submit").on("click",function(event){
   	// prevents page from refreshing
   	event.preventDefault();
 
@@ -36,5 +38,6 @@
   		destination: destination,
   		firstTime: firstTime,
   		frequency: frequency
-  	})
+  	});
+    
   });
