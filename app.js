@@ -21,23 +21,41 @@
   var name = "";
   var destination = "";
   var firstTime = "";
-  var frequency = "";
-  var currentTime = moment().format('h:mm a');
+  var frequency = 0;
+  var nextArrival = "";
+  var minutesAway = "";
+  var currentTime = moment().format("X");
 
-  $("#submit").on("click",function(event){
-  	// prevents page from refreshing
-  	event.preventDefault();
+$("#submit").on("click",function(event){
+	// prevents page from refreshing
+	event.preventDefault();
 
-  	name = $("#trainName").val().trim();
-  	destination = $("#destination").val().trim();
-  	firstTime = $("#time").val().trim();
-  	frequency = $("#frequency").val().trim();
+  name = $("#trainName").val().trim();
+  destination = $("#destination").val().trim();
+  frequency = $("#frequency").val().trim();
+  firstTime = moment($("#time").val().trim(),"LT").format("X");
 
-  	database.ref().set({
-  		name: name,
-  		destination: destination,
-  		firstTime: firstTime,
-  		frequency: frequency
-  	});
-    
-  });
+	database.ref().push({
+		name: name,
+		destination: destination,
+    frequency: frequency,
+		firstTime: firstTime,
+    dateAdded: firebase.database.ServerValue.TIMESTAMP
+	});
+
+  $(".form-control").val("");
+});
+
+database.ref().on("child_added", function(snapshot){
+  var name = snapshot.val().name;
+  var destination = snapshot.val().destination;
+  var frequency = parseInt(snapshot.val().frequency);
+  var firstTime = snapshot.val().firstTime;
+  var multiplier = Math.ceil(parseInt(moment().diff(moment.unix(firstTime, "X"), 'minutes'))/frequency);
+  var nextArrival = moment.unix(firstTime, "X").add(multiplier*frequency, "minutes");
+  var minutesAway = moment(nextArrival).diff(moment(),"minutes")+1;
+
+  $("#rows").prepend("<tr><td>"+name+"</td><td>"+destination+"</td><td>"+frequency+"</td><td>"+moment(nextArrival).format("LT")+"</td><td>"+minutesAway+"</td></tr>"
+    );
+});
+
